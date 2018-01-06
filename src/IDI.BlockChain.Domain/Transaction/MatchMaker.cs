@@ -26,6 +26,10 @@ namespace IDI.BlockChain.Domain.Transaction
 
                 return result;
             }
+            else
+            {
+                TradeLogger.Instance.Update();
+            }
 
 
             return TradeResult.None();

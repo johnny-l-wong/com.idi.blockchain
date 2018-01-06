@@ -24,7 +24,7 @@ namespace IDI.BlockChain.Domain.Transaction
 
         public void Init()
         {
-            info = new TradeInfo();
+            info = new TradeInfo { Price = 30, Open = 30, Close = 30, High = 30, Low = 30 };
             logs = new List<TradeLog>();
             klines = new Dictionary<KLineRange, List<Line>>();
 
@@ -41,12 +41,14 @@ namespace IDI.BlockChain.Domain.Transaction
             return info;
         }
 
-        public List<Line> GetKLine(KLineRange range)
+        public List<List<decimal>> GetKLine(KLineRange range)
         {
             if (!klines.ContainsKey(range))
-                return new List<Line>();
+                return new List<List<decimal>>();
 
-            return klines[range];
+            var lines = klines[range];
+
+            return lines.Select(e => new List<decimal> { e.TimeScale.AsLong(), e.Open, e.High, e.Low, e.Close, e.Volume }).ToList();
         }
 
         public List<Trade> GetTrades(int count = 100)
@@ -62,11 +64,55 @@ namespace IDI.BlockChain.Domain.Transaction
             {
                 logs.Add(log);
             }
+
+            this.info.Price = log.Price;
+
+            if (this.info.High < log.Price)
+                this.info.High = log.Price;
+
+            if (this.info.Low > log.Price)
+                this.info.Low = log.Price;
+
+            this.info.Volume += log.Volume;
+
+            CreateOrUpdateKLine(log.Time, log.Volume);
         }
 
         public void Update()
         {
+            CreateOrUpdateKLine(DateTime.Now, 0);
+        }
 
+        private void CreateOrUpdateKLine(DateTime time, decimal volume)
+        {
+            var ranges = typeof(KLineRange).GetEnumValues();
+
+            foreach (KLineRange range in ranges)
+            {
+                var timescale = GetTimeScale(range, time);
+
+                var line = klines[range].SingleOrDefault(e => e.TimeScale == timescale && e.Range == range);
+
+                if (line == null)
+                {
+                    line = new Line { TimeScale = timescale, Range = range, Open = info.Price, Close = info.Price, High = info.Price, Low = info.Price, Volume = volume };
+
+                    klines[range].Add(line);
+                }
+                else
+                {
+                    var index = klines[range].IndexOf(line);
+
+                    if (klines[range][index].High < info.Price)
+                        klines[range][index].High = info.Price;
+
+                    if (klines[range][index].Low > info.Price)
+                        klines[range][index].Low = info.Price;
+
+                    klines[range][index].Close = info.Price;
+                    klines[range][index].Volume += volume;
+                }
+            }
         }
 
         public DateTime GetTimeScale(KLineRange range, DateTime time)

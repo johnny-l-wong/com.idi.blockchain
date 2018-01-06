@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using IDI.BlockChain.Common.Enums;
 using IDI.BlockChain.Models.Base;
 using IDI.BlockChain.Models.Transaction;
 
@@ -72,9 +73,15 @@ namespace IDI.BlockChain.Domain.Transaction
         }
         #endregion
 
-        public KLine GetKLine()
+        public KLine GetKLine(KLineRange range)
         {
-            return new KLine { Depths = TradeQueue.Instance.GetDepths(), Trades = TradeLogger.Instance.GetTrades() };
+            return new KLine
+            {
+                Depths = TradeQueue.Instance.GetDepths(),
+                Info = TradeLogger.Instance.GetInfo(),
+                Trades = TradeLogger.Instance.GetTrades(),
+                Lines = TradeLogger.Instance.GetKLine(range)
+            };
         }
 
         public void Start()

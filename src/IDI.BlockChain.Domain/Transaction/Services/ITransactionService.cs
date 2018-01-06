@@ -1,4 +1,5 @@
 ﻿using IDI.Core.Common;
+using IDI.BlockChain.Common.Enums;
 using IDI.BlockChain.Models.Transaction;
 
 namespace IDI.BlockChain.Domain.Transaction.Services
@@ -15,6 +16,6 @@ namespace IDI.BlockChain.Domain.Transaction.Services
 
         Result Ask(int uid, decimal price, decimal size);
 
-        Result<KLine> GetKLine();
+        Result<KLine> GetKLine(KLineRange range);
     }
 }
