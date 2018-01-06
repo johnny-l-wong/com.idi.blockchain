@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.16
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDI.Core", "IDI.Core\IDI.Core.csproj", "{5FFE5588-D042-4170-9E11-616E70C68A17}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDI.BlockChain.Domain", "IDI.BlockChain.Domain\IDI.BlockChain.Domain.csproj", "{4F4F42F6-8403-4A7D-8A15-10FD3F45CAB8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDI.BlockChain.Common", "IDI.BlockChain.Common\IDI.BlockChain.Common.csproj", "{6D28348E-3A83-40D1-8EDC-A864B4142D14}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDI.BlockChain.Models", "IDI.BlockChain.Models\IDI.BlockChain.Models.csproj", "{BD42CA1E-9010-4F57-928A-487C9AC7C8A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDI.BlockChain.Domain.Tests", "IDI.BlockChain.Domain.Tests\IDI.BlockChain.Domain.Tests.csproj", "{2975D881-69E7-4A6A-835F-914C0A5D5A7B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDI.BlockChain.Transaction.Client", "IDI.BlockChain.Transaction.Client\IDI.BlockChain.Transaction.Client.csproj", "{D4EEED1A-2F3D-4884-AFAC-C4CDA4CCF088}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDI.BlockChain.Transaction.Service", "IDI.BlockChain.Transaction.Service\IDI.BlockChain.Transaction.Service.csproj", "{AF57F33B-0748-4EC5-8814-24EE152D9928}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5FFE5588-D042-4170-9E11-616E70C68A17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FFE5588-D042-4170-9E11-616E70C68A17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FFE5588-D042-4170-9E11-616E70C68A17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FFE5588-D042-4170-9E11-616E70C68A17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F4F42F6-8403-4A7D-8A15-10FD3F45CAB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F4F42F6-8403-4A7D-8A15-10FD3F45CAB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F4F42F6-8403-4A7D-8A15-10FD3F45CAB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F4F42F6-8403-4A7D-8A15-10FD3F45CAB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D28348E-3A83-40D1-8EDC-A864B4142D14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D28348E-3A83-40D1-8EDC-A864B4142D14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D28348E-3A83-40D1-8EDC-A864B4142D14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D28348E-3A83-40D1-8EDC-A864B4142D14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD42CA1E-9010-4F57-928A-487C9AC7C8A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD42CA1E-9010-4F57-928A-487C9AC7C8A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD42CA1E-9010-4F57-928A-487C9AC7C8A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD42CA1E-9010-4F57-928A-487C9AC7C8A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2975D881-69E7-4A6A-835F-914C0A5D5A7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2975D881-69E7-4A6A-835F-914C0A5D5A7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2975D881-69E7-4A6A-835F-914C0A5D5A7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2975D881-69E7-4A6A-835F-914C0A5D5A7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4EEED1A-2F3D-4884-AFAC-C4CDA4CCF088}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4EEED1A-2F3D-4884-AFAC-C4CDA4CCF088}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4EEED1A-2F3D-4884-AFAC-C4CDA4CCF088}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4EEED1A-2F3D-4884-AFAC-C4CDA4CCF088}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF57F33B-0748-4EC5-8814-24EE152D9928}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF57F33B-0748-4EC5-8814-24EE152D9928}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF57F33B-0748-4EC5-8814-24EE152D9928}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF57F33B-0748-4EC5-8814-24EE152D9928}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {17915FA8-D029-4EAD-A857-0936F2F4B18A}
+	EndGlobalSection
+EndGlobal

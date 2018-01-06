@@ -1,0 +1,321 @@
+﻿@page
+@model IDI.BlockChain.Transaction.Client.Pages.BTCUSDTModel
+@{
+    ViewData["Title"] = "BTC/USDT";
+}
+
+<div id="app" class="container-fluid">
+    <ul class="nav nav-tabs" style="margin-top:5px; margin-bottom:5px;">
+        <li role="presentation" class="active"><a href="#">@ViewData["Title"]</a></li>
+        <li role="presentation"><a href="#">HSR/USDT</a></li>
+        <li role="presentation"><a href="#">OHS/USDT</a></li>
+    </ul>
+    <div class="row">
+        <!--KLine-->
+        <div class="col-xs-8">
+            <div id="klinebox" style="width:auto;height:650px;overflow:hidden;">
+                <div id="kline_container"></div>
+            </div>
+        </div>
+
+        <!--Panel-->
+        <div class="col-xs-4">
+            <!--Trades & Buy/Sell-->
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="panel panel-default">
+                        @*<div class="panel-heading">Trades</div>*@
+                        <div class="panel-body" style="height:300px;overflow-y:auto;">
+                            <div class="row" v-bind:id="'trade'+item.id" v-for="item in trades">
+                                <div class="col-xs-4">{{item.time}}</div>
+                                <div class="col-xs-4">{{Number(item.price).toFixed(2)}}</div>
+                                <div class="col-xs-4">{{Number(item.volume).toFixed(2)}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="panel panel-default">
+                        @*<div class="panel-heading">Buy/Sell</div>*@
+                        <div class="panel-body" style="height:300px;overflow-y:auto;">
+                            <div class="row" v-bind:id="'bid'+item[2]" v-for="(item,index) in bids">
+                                <div class="col-xs-4">Buy {{item[2]}}</div>
+                                <div class="col-xs-4">{{Number(item[0]).toFixed(2)}}</div>
+                                <div class="col-xs-4">{{Number(item[1]).toFixed(2)}}</div>
+                            </div>
+                            <hr />
+                            <div class="row" v-bind:id="'ask'+item[2]" v-for="(item,index) in asks">
+                                <div class="col-xs-4">Sell {{item[2]}}</div>
+                                <div class="col-xs-4">{{Number(item[0]).toFixed(2)}}</div>
+                                <div class="col-xs-4">{{Number(item[1]).toFixed(2)}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Bid/Ask-->
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="panel panel-default">
+                        @*<div class="panel-heading">Bid</div>*@
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-addon">USDT</div>
+                                    <input id="bid_price" type="number" class="form-control" v-model="bid.price" placeholder="Price">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-addon">&nbsp;BTC&nbsp;</div>
+                                    <input id="bid_volume" type="number" class="form-control" v-model="bid.volume" placeholder="Volume">
+                                </div>
+                            </div>
+                            <button id="btnBid" type="submit" class="btn btn-danger btn-block" v-on:click="onBid">Bid</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="panel panel-default">
+                        @*<div class="panel-heading">Ask</div>*@
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-addon">USDT</div>
+                                    <input id="ask_price" type="number" class="form-control" v-model="ask.price" placeholder="Price">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-addon">&nbsp;BTC&nbsp;</div>
+                                    <input id="ask_volume" type="number" class="form-control" v-model="ask.volume" placeholder="Volume">
+                                </div>
+                            </div>
+                            <button id="btnAsk" type="submit" class="btn btn-success btn-block" v-on:click="onAsk">Ask</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Controls-->
+            <div class="row">
+                <div class="col-xs-6">
+                </div>
+                <div class="col-xs-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Control Panel</div>
+                        <div class="panel-body">
+                            <div class="btn-group" role="group">
+                                <button id="btnStart" type="button" class="btn btn-default" v-on:click="onStart">Start</button>
+                                <button id="btnStop" type="button" class="btn btn-default" v-on:click="onStop" disabled="disabled">Stop</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        Number.prototype.toFixed = function (s) {
+            var number = this.toString();
+            if (number.indexOf('.') == -1) {
+                var zeroes = '.';
+                for (var i = 0; i < s; i++) {
+                    zeroes = zeroes + '0';
+                }
+                number = number + zeroes;
+            } else {
+                number = number + '000000000000';
+                number = number.split('.')[0] + '.' + number.split('.')[1].substring(0, s);
+            }
+            return number;
+        }
+
+        var kline = new Kline({
+            element: "#kline_container",
+            width: 1200,
+            height: 650,
+            theme: 'dark',
+            language: 'zh-cn',
+            ranges: ["1w", "1d", "1h", "30m", "15m", "5m", "1m", "line"],
+            symbol: "BTC/USDT",
+            symbolName: "BTC/USDT",
+            //type: "signalR",
+            type: "poll",
+            url: "http://localhost:29835/data/mock.json",
+            account:10001,
+            limit: 1000,
+            intervalTime: 5000,
+            debug: false,
+            showTrade: false,
+            onKlineChange: function (data) {
+                //app.onLoad(data);
+                resize();
+            },
+            //onOrderChange: function (data) {
+            //    //app.onload('order', data);
+            //}
+        });
+
+        function resize() {
+            var width = $("#klinebox").width();
+            var height = $("#klinebox").height();
+            kline.resize(width, height);
+        }
+
+        $(function () {
+            kline.draw();
+            resize();
+            $(window).resize(function () { resize(); });
+        });
+
+        var app = new Vue({
+            el: '#app',
+            data: {
+                info: { price: 0.00, open: 0.0, high: 0.0, low: 0.0, rate: 0.00, volume: 0.0, trend: 0 },
+                asks: [],
+                bids: [],
+                trades: [],
+                bid: { price: 10, volume: 10 },
+                ask: { price: 10, volume: 10 },
+                polling:false
+            },
+            created: function () {
+                this.onPull();
+            },
+            methods: {
+                onLoad: function (data) {
+                    this.asks = data.depths.asks;
+                    this.bids = data.depths.bids;
+                    this.trades = data.trades;
+                },
+                onPull: function () {
+                    var self = this;
+
+                    setInterval(function () {
+                        if (self.polling)
+                            return;
+
+                        $.ajax({
+                            type: "get", datatype: "json",
+                            url: "http://localhost:17528/api/trans/quotation",
+                            beforeSend: function () {
+                                self.polling = true;
+                            },
+                            success: function (result) {
+                                self.polling = false;
+                                if (result.status == 1&&result.data.success) {
+                                    self.onLoad(result.data.data);
+                                }
+                            },
+                            error: function (result) {
+                                self.polling = false;
+                            }
+                        });
+                    }, 3000);
+                },
+                onStart: function () {
+                    var self = this;
+
+                    $.ajax({
+                        type: "post",
+                        crossDomain: true,
+                        url: "http://localhost:17528/api/trans/start",
+                        datatype: "json",
+                        beforeSend: function () {
+                            $("#btnStart").attr("disabled", "disabled");
+                            $("#btnStop").removeAttr("disabled", "disabled");
+                        },
+                        success: function (result) {
+                            if (result.status == 1) {
+                                $("#btnStart").attr("disabled", "disabled");
+                                $("#btnStop").removeAttr("disabled", "disabled");
+                            } else {
+                                $("#btnStart").removeAttr("disabled", "disabled");
+                                $("#btnStop").attr("disabled", "disabled");
+                            }
+
+                            alert(result.message);
+                        }
+                    });
+                },
+                onStop: function () {
+                    var self = this;
+
+                    $.ajax({
+                        type: "post",
+                        crossDomain: true,
+                        url: "http://localhost:17528/api/trans/stop",
+                        datatype: "json",
+                        beforeSend: function () {
+                            $("#btnStart").removeAttr("disabled", "disabled");
+                            $("#btnStop").attr("disabled", "disabled");
+                        },
+                        success: function (result) {
+                            if (result.status == 1) {
+                                $("#btnStart").removeAttr("disabled", "disabled");
+                                $("#btnStop").attr("disabled", "disabled");
+                            } else {
+                                $("#btnStart").attr("disabled", "disabled");
+                                $("#btnStop").removeAttr("disabled", "disabled");
+                            }
+                            alert(result.message);
+                        }
+                    });
+                },
+                onBid: function () {
+                    var self = this;
+
+                    $.ajax({
+                        type: "post",
+                        crossDomain: true,
+                        url: "http://localhost:17528/api/trans/trade",
+                        data: JSON.stringify({ uid: 10001, tran_type: 1, price: self.bid.price, size: self.bid.volume }),
+                        contentType: "application/json; charset=utf-8",
+                        datatype: "json",
+                        beforeSend: function () {
+                            $("#btnBid").attr("disabled","disabled");
+                        },
+                        complete: function () {
+                            $("#btnBid").removeAttr("disabled");
+                        },
+                        success: function (result) {
+                            $("#btnBid").removeAttr("disabled");
+                            alert(result.message);
+                        }
+                    });
+                },
+                onAsk: function () {
+                    var self = this;
+
+                    $.ajax({
+                        type: "post",
+                        crossDomain: true,
+                        url: "http://localhost:17528/api/trans/trade",
+                        data: JSON.stringify({ uid: 10002, tran_type: 0, price: self.ask.price, size: self.ask.volume }),
+                        contentType: "application/json; charset=utf-8",
+                        datatype: "json",
+                        beforeSend: function () {
+                            $("#btnAsk").attr("disabled", "disabled");
+                        },
+                        complete: function () {
+                            $("#btnAsk").removeAttr("disabled");
+                        },
+                        success: function (result) {
+                            $("#btnAsk").removeAttr("disabled");
+                            alert(result.message);
+                        }
+                    });
+                }
+            },
+        });
+    </script>
+}
+
+
+
+

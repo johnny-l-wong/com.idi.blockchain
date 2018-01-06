@@ -1,0 +1,16 @@
+/src/.vs
+/src/IDI.Core/bin
+/src/IDI.Core/obj
+/src/IDI.BlockChain.Common/bin
+/src/IDI.BlockChain.Common/obj
+/src/IDI.BlockChain.Domain/bin
+/src/IDI.BlockChain.Domain/obj
+/src/IDI.BlockChain.Domain.Tests/bin
+/src/IDI.BlockChain.Domain.Tests/obj
+/src/IDI.BlockChain.Models/bin
+/src/IDI.BlockChain.Models/obj
+/src/IDI.BlockChain.Transaction.Service/obj
+/src/IDI.BlockChain.Transaction.Service/bin
+/src/IDI.BlockChain.Transaction.Client/obj
+/src/IDI.BlockChain.Transaction.Client/bin
+/src/IDI.BlockChain.Transaction.Service/*.user
