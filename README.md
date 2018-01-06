@@ -1,2 +1,2 @@
 # com.idi.blockchain
-Block Chain Ecosystem
+IDI Studio Block Chain Ecosystem
