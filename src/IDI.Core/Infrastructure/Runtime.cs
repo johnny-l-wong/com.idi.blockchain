@@ -30,7 +30,9 @@ namespace IDI.Core.Infrastructure
                     services = collection ?? new ServiceCollection();
 
                     var repository = LogManager.CreateRepository("IDI.Core.LoggerRepository");
-                    XmlConfigurator.Configure(repository, new FileInfo("Configs/log4net.config"));
+
+                    //log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(AppDomain.CurrentDomain.BaseDirectory + "log4net.config"));
+                    XmlConfigurator.ConfigureAndWatch(repository, new FileInfo($"{AppDomain.CurrentDomain.BaseDirectory}Configs/log4net.config"));
 
                     services.AddSingleton(LogManager.GetLogger(repository.Name, typeof(Runtime)));
                     services.AddSingleton<ILogger, Log4NetLogger>();

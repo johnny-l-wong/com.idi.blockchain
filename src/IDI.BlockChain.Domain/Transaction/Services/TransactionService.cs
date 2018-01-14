@@ -32,7 +32,8 @@ namespace IDI.BlockChain.Domain.Transaction.Services
         #region Events
         private void OnTradeCompleted(TradeResult result)
         {
-            _logger.Info($"trade:{result.ToJson()}");
+            if (result.Logs.Count > 0)
+                _logger.Info($"trade:{result.ToJson()}");
         }
 
         private void OnAskEnqueue(TradeOrder order)
