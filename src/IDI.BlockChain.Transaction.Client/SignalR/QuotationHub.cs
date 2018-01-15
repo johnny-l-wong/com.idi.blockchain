@@ -33,7 +33,7 @@ namespace IDI.BlockChain.Transaction.Client.SignalR
             {
                 var groupName = $"kline/{kvp.Value.Symbol}/{kvp.Value.Range}";
 
-                await Clients.Group(groupName).InvokeAsync("klineChanged", kvp.Value);
+                await Clients.Group(groupName).InvokeAsync("quotationUpdated", kvp.Value);
             }
         }
     }

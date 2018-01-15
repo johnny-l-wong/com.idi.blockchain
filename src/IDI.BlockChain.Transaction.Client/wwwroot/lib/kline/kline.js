@@ -9133,7 +9133,7 @@ function RequestData(showLoading) {
     if (KlineIns.type == "socket" && KlineIns.socketClient) {
         requestOverSocket();
     }
-    else if (KlineIns.type == "signalR") {
+    else if (KlineIns.type == "signalr") {
         requestOverSignalR();
     }
     else {
@@ -9208,70 +9208,121 @@ function requestOverSignalR() {
         return;
 
     $(document).ready(function () {
-        KlineIns.ticker = $.connection.quotationTicker;
-
-        function init() {
+        var transportType = signalR.TransportType.WebSockets;
+        //var logger = new signalR.ConsoleLogger(signalR.LogLevel.Information);
+        //var quotationHub = new signalR.HttpConnection(`http://${document.location.host}/quotation`, { transport: transportType, logger: logger });
+        var quotationHub = new signalR.HttpConnection(`http://${document.location.host}/quotation`, { transport: transportType });
+        //KlineIns.ticker = new signalR.HubConnection(quotationHub, logger);
+        KlineIns.ticker = new signalR.HubConnection(quotationHub);
+        KlineIns.ticker.on('quotationUpdated', (data) => {
             if (KlineIns.debug) {
-                console.log(`DEBUG: ${KlineIns.account}:${KlineIns.symbol}/${KlineIns.range}`);
+                console.log(`received:${data}`);
             }
-            return KlineIns.ticker.server.getData(KlineIns.symbol, KlineIns.range, KlineIns.account).done(function (data) {
-                if (KlineIns.debug) {
-                    console.log("getData");
-                };
-            });
-        }
-
-        // Add client-side hub methods that the server will call
-        $.extend(KlineIns.ticker.client, {
-            updateKLine: function (data) {
-                if (data.success) {
-                    if (data.symbol === KlineIns.symbol && data.range === KlineIns.range) {
-                        if (KlineIns.debug) {
-                            console.log("kline updated");
-                        }
-                        requestSuccessHandler(data);
+            if (data.success) {
+                if (data.symbol === KlineIns.symbol && data.range === KlineIns.range) {
+                    if (KlineIns.debug) {
+                        console.log("quotation updated");
                     }
-                } else {
-                    console.log('kline update error.')
+                    requestSuccessHandler(data);
                 }
-            },
-            updateOrder: function (data) {
-                if (data.success) {
-                    if (data.symbol === KlineIns.symbol && data.account === KlineIns.account) {
-                        if (KlineIns.debug) {
-                            console.log("order updated");
-                        }
-                        KlineIns.onOrderChange(data);
-                    }
-                } else {
-                    console.log('order update error.')
-                }
+            } else {
+                console.log('quotation update error.')
             }
         });
 
-        // Start the connection
-        $.connection.hub.start()
-            .then(init)
-            .then(function () {
-                return KlineIns.ticker.server.getMarketState();
+        KlineIns.ticker.start()
+            .then(() => {
+                console.log('connected successfully');
+                isConnected = true;
+                //KlineIns.ticker.invoke('Subscribe', KlineIns.symbol, KlineIns.range);
             })
-            .done(function (state) {
-                if (state === 'Closed') {
-                    KlineIns.ticker.server.openMarket();
-                }
+            .catch(err => {
+                console.log(err);
             });
+
+        invoke(KlineIns.ticker, 'Subscribe', KlineIns.symbol, KlineIns.range);
     });
+    //$(document).ready(function () {
+    //    KlineIns.ticker = $.connection.quotationTicker;
+
+    //    function init() {
+    //        if (KlineIns.debug) {
+    //            console.log(`DEBUG: ${KlineIns.account}:${KlineIns.symbol}/${KlineIns.range}`);
+    //        }
+    //        return KlineIns.ticker.server.getData(KlineIns.symbol, KlineIns.range, KlineIns.account).done(function (data) {
+    //            if (KlineIns.debug) {
+    //                console.log("getData");
+    //            };
+    //        });
+    //    }
+
+    //    // Add client-side hub methods that the server will call
+    //    $.extend(KlineIns.ticker.client, {
+    //        updateKLine: function (data) {
+    //            if (data.success) {
+    //                if (data.symbol === KlineIns.symbol && data.range === KlineIns.range) {
+    //                    if (KlineIns.debug) {
+    //                        console.log("kline updated");
+    //                    }
+    //                    requestSuccessHandler(data);
+    //                }
+    //            } else {
+    //                console.log('kline update error.')
+    //            }
+    //        },
+    //        updateOrder: function (data) {
+    //            if (data.success) {
+    //                if (data.symbol === KlineIns.symbol && data.account === KlineIns.account) {
+    //                    if (KlineIns.debug) {
+    //                        console.log("order updated");
+    //                    }
+    //                    KlineIns.onOrderChange(data);
+    //                }
+    //            } else {
+    //                console.log('order update error.')
+    //            }
+    //        }
+    //    });
+
+    //    // Start the connection
+    //    $.connection.hub.start()
+    //        .then(init)
+    //        .then(function () {
+    //            return KlineIns.ticker.server.getMarketState();
+    //        })
+    //        .done(function (state) {
+    //            if (state === 'Closed') {
+    //                KlineIns.ticker.server.openMarket();
+    //            }
+    //        });
+    //});
+}
+var isConnected = false;
+function invoke(connection, method, ...args) {
+    if (!isConnected) {
+        return;
+    }
+    var argsArray = Array.prototype.slice.call(arguments);
+    connection.invoke.apply(connection, argsArray.slice(1))
+        .then(result => {
+            console.log("invocation completed successfully: " + (result === null ? '(null)' : result));
+        })
+        .catch(err => {
+            console.log(err);
+        });
 }
 
-function periodChanged() {
+function periodChanged(original) {
     if (!KlineIns.ticker)
         return;
 
-    return KlineIns.ticker.server.getKLine(KlineIns.symbol, KlineIns.range).done(function (data) {
-        if (KlineIns.debug) {
-            console.log(`join group '${KlineIns.symbol}/${KlineIns.range}'`);
-        };
-    });
+    KlineIns.ticker.invoke('Unsubscribe', original.symbol, original.range);
+    KlineIns.ticker.invoke('Subscribe', KlineIns.symbol, KlineIns.range);
+    //return KlineIns.ticker.server.getKLine(KlineIns.symbol, KlineIns.range).done(function (data) {
+    //    if (KlineIns.debug) {
+    //        console.log(`join group '${KlineIns.symbol}/${KlineIns.range}'`);
+    //    };
+    //});
 }
 
 function requestSuccessHandler(res) {
@@ -9698,6 +9749,8 @@ function switch_indic(name) {
 
 function switch_period(name) {
 
+    var original = { symbol: KlineIns.symbol, range: KlineIns.range };
+
     $(".chart_container .chart_toolbar_tabgroup a").removeClass("selected");
     $("#chart_toolbar_periods_vert ul a").removeClass("selected");
     $(".chart_container .chart_toolbar_tabgroup a").each(function () {
@@ -9729,7 +9782,7 @@ function switch_period(name) {
     settings.charts.period = name;
     ChartSettings.save();
 
-    periodChanged();
+    periodChanged(original);
 }
 
 function reset(symbol) {

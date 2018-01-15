@@ -144,17 +144,16 @@
             ranges: ["1w", "1d", "1h", "30m", "15m", "5m", "1m", "line"],
             symbol: "BTC/USDT",
             symbolName: "BTC/USDT",
-            //type: "signalR",
-            type: "poll",
-            //url: "http://localhost:29835/data/mock.json",
-            url: "http://localhost:17528/api/trans/quotation",
+            type: "signalr",
+            //type: "poll",
+            //url: "http://localhost:17528/api/trans/quotation",
             account:10001,
             limit: 1000,
             intervalTime: 5000,
             debug: false,
             showTrade: false,
             onKlineChange: function (data) {
-                //app.onLoad(data);
+                app.onLoad(data);
                 resize();
             },
             //onOrderChange: function (data) {
@@ -185,9 +184,9 @@
                 ask: { price: 10, volume: 10 },
                 polling:false
             },
-            created: function () {
-                this.onPull();
-            },
+            //created: function () {
+            //    this.onPull();
+            //},
             methods: {
                 onLoad: function (data) {
                     this.info = data.info;
