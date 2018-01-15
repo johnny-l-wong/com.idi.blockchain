@@ -1,7 +1,7 @@
-﻿using IDI.Core.Common;
-using IDI.BlockChain.Common.Enums;
+﻿using IDI.BlockChain.Common.Enums;
 using IDI.BlockChain.Domain.Transaction.Services;
 using IDI.BlockChain.Models.Transaction;
+using IDI.Core.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IDI.BlockChain.Transaction.Service.Controllers
@@ -16,11 +16,11 @@ namespace IDI.BlockChain.Transaction.Service.Controllers
             this.service = service;
         }
 
-        [HttpGet("quotation")]
-        public Result<Quotation> GetQuotation()
+        [HttpGet("quotation/{symbol}/{range}")]
+        public Result<Quotation> GetQuotation(string symbol, KLineRange range)
         {
-            var quotation = new Quotation { Symbol = "BTC/USDH", Success = false };
-            var result = service.GetKLine(KLineRange.M1);
+            var quotation = new Quotation { Symbol = symbol, Success = false };
+            var result = service.GetKLine(range);
 
             if (result.Status == ResultStatus.Success)
             {

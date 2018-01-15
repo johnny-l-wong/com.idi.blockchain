@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IDI.BlockChain.Transaction.Client.SignalR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -22,6 +23,7 @@ namespace IDI.BlockChain.Transaction.Client
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -38,6 +40,10 @@ namespace IDI.BlockChain.Transaction.Client
             }
 
             app.UseStaticFiles();
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<QuotationHub>("quotation");
+            });
 
             app.UseMvc(routes =>
             {
