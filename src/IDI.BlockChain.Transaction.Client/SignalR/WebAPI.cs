@@ -19,7 +19,8 @@ namespace IDI.BlockChain.Transaction.Client.SignalR
                 //{
                 //    var obj = e.Result;
                 //};
-                string json = await client.DownloadStringTaskAsync(new Uri($"{Configure.Api}/{url}"));
+                string json = await client.DownloadStringTaskAsync(new Uri($"http://localhost:17528/api/{url}"));
+                //string json = await client.DownloadStringTaskAsync(new Uri($"{Configure.Api}/{url}"));
 
                 return json.To<T>();
             }

@@ -9209,11 +9209,11 @@ function requestOverSignalR() {
 
     $(document).ready(function () {
         var transportType = signalR.TransportType.WebSockets;
-        //var logger = new signalR.ConsoleLogger(signalR.LogLevel.Information);
-        //var quotationHub = new signalR.HttpConnection(`http://${document.location.host}/quotation`, { transport: transportType, logger: logger });
-        var quotationHub = new signalR.HttpConnection(`http://${document.location.host}/quotation`, { transport: transportType });
-        //KlineIns.ticker = new signalR.HubConnection(quotationHub, logger);
-        KlineIns.ticker = new signalR.HubConnection(quotationHub);
+        var logger = new signalR.ConsoleLogger(signalR.LogLevel.Information);
+        var quotationHub = new signalR.HttpConnection(`http://${document.location.host}/quotation`, { transport: transportType, logger: logger });
+        //var quotationHub = new signalR.HttpConnection(`http://${document.location.host}/quotation`, { transport: transportType });
+        KlineIns.ticker = new signalR.HubConnection(quotationHub, logger);
+        //KlineIns.ticker = new signalR.HubConnection(quotationHub);
         KlineIns.ticker.on('quotationUpdated', (data) => {
             if (KlineIns.debug) {
                 console.log(`received:${data}`);
@@ -9233,14 +9233,15 @@ function requestOverSignalR() {
         KlineIns.ticker.start()
             .then(() => {
                 console.log('connected successfully');
-                isConnected = true;
-                //KlineIns.ticker.invoke('Subscribe', KlineIns.symbol, KlineIns.range);
+                //isConnected = true;
+                KlineIns.ticker.invoke('Open');
+                KlineIns.ticker.invoke('Subscribe', KlineIns.symbol, KlineIns.range);
             })
             .catch(err => {
                 console.log(err);
             });
 
-        invoke(KlineIns.ticker, 'Subscribe', KlineIns.symbol, KlineIns.range);
+        //invoke(KlineIns.ticker, 'Subscribe', KlineIns.symbol, KlineIns.range);
     });
     //$(document).ready(function () {
     //    KlineIns.ticker = $.connection.quotationTicker;
@@ -9297,20 +9298,20 @@ function requestOverSignalR() {
     //        });
     //});
 }
-var isConnected = false;
-function invoke(connection, method, ...args) {
-    if (!isConnected) {
-        return;
-    }
-    var argsArray = Array.prototype.slice.call(arguments);
-    connection.invoke.apply(connection, argsArray.slice(1))
-        .then(result => {
-            console.log("invocation completed successfully: " + (result === null ? '(null)' : result));
-        })
-        .catch(err => {
-            console.log(err);
-        });
-}
+//var isConnected = false;
+//function invoke(connection, method, ...args) {
+//    if (!isConnected) {
+//        return;
+//    }
+//    var argsArray = Array.prototype.slice.call(arguments);
+//    connection.invoke.apply(connection, argsArray.slice(1))
+//        .then(result => {
+//            console.log("invocation completed successfully: " + (result === null ? '(null)' : result));
+//        })
+//        .catch(err => {
+//            console.log(err);
+//        });
+//}
 
 function periodChanged(original) {
     if (!KlineIns.ticker)

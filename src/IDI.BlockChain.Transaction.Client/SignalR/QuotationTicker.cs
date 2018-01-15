@@ -11,8 +11,8 @@ namespace IDI.BlockChain.Transaction.Client.SignalR
 {
     public enum QuotationState
     {
-        Open,
-        Close
+        Closed,
+        Open
     }
 
     public sealed class QuotationTicker : Singleton<QuotationTicker>
@@ -73,7 +73,7 @@ namespace IDI.BlockChain.Transaction.Client.SignalR
 
             foreach (KLineRange range in ranges)
             {
-                var task = WebAPI.Get<Result<Quotation>>($"{symbol}/{range}");
+                var task = WebAPI.Get<Result<Quotation>>($"trans/quotation/{symbol.Replace("/", "")}/{(uint)range}");
 
                 task.Wait();
 
@@ -83,7 +83,7 @@ namespace IDI.BlockChain.Transaction.Client.SignalR
                 }
             }
 
-            return false;
+            return quotations.Count > 0;
         }
 
         private bool TryUpdateQuotationCache(Quotation cache, Quotation current)

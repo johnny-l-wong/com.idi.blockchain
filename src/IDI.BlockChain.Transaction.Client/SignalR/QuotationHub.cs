@@ -10,7 +10,13 @@ namespace IDI.BlockChain.Transaction.Client.SignalR
     {
         public QuotationHub()
         {
-            QuotationTicker.Instance.BroadcastQuotation = BroadcastQuotation;
+            if (QuotationTicker.Instance.BroadcastQuotation == null)
+                QuotationTicker.Instance.BroadcastQuotation = BroadcastQuotation;
+        }
+
+        public void Open()
+        {
+            QuotationTicker.Instance.Open();
         }
 
         public async Task Subscribe(string symbol, KLineRange range)
