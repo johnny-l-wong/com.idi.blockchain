@@ -10,80 +10,80 @@ namespace IDI.BlockChain.Domain.Transaction.Services
 {
     public class TransactionService : ITransactionService
     {
-        private readonly ILogger _logger;
-        private readonly TradeDrive _drive;
-        private readonly Guid _id;
+        private readonly ILogger logger;
+        private readonly TradeDrive drive;
+        private readonly Guid id;
 
-        public bool Running => _drive.Running;
+        public bool Running => drive.Running;
 
         public TransactionService(ILogger logger)
         {
-            _id = Guid.NewGuid();
-            _logger = logger;
-            _drive = new TradeDrive();
-            _drive.DriveStarted += OnStarted;
-            _drive.DriveStopped += OnStopped;
-            _drive.BidEnqueue += OnBidEnqueue;
-            _drive.AskEnqueue += OnAskEnqueue;
-            _drive.TradeCompleted += OnTradeCompleted;
-            _drive.Start();
+            id = Guid.NewGuid();
+            this.logger = logger;
+            drive = new TradeDrive();
+            drive.DriveStarted += OnStarted;
+            drive.DriveStopped += OnStopped;
+            drive.BidEnqueue += OnBidEnqueue;
+            drive.AskEnqueue += OnAskEnqueue;
+            drive.TradeCompleted += OnTradeCompleted;
+            drive.Start();
         }
 
         #region Events
         private void OnTradeCompleted(TradeResult result)
         {
             if (result.Logs.Count > 0)
-                _logger.Info($"trade:{result.ToJson()}");
+                logger.Info($"trade:{result.ToJson()}");
         }
 
         private void OnAskEnqueue(TradeOrder order)
         {
-            _logger.Info($"ask:{order.ToJson()}");
+            logger.Info($"ask:{order.ToJson()}");
         }
 
         private void OnBidEnqueue(TradeOrder order)
         {
-            _logger.Info($"bid:{order.ToJson()}");
+            logger.Info($"bid:{order.ToJson()}");
         }
 
         private void OnStopped()
         {
-            _logger.Info("transaction service stopped");
+            logger.Info($"transaction service {id} stopped");
         }
 
         private void OnStarted()
         {
-            _logger.Info("transaction service started");
+            logger.Info($"transaction service {id} started");
         }
         #endregion
 
         public Result Ask(int uid, decimal price, decimal size)
         {
-            _drive.Ask(uid, price, size);
+            drive.Ask(uid, price, size);
 
             return Result.Success("ask success.");
         }
 
         public Result Bid(int uid, decimal price, decimal size)
         {
-            _drive.Bid(uid, price, size);
+            drive.Bid(uid, price, size);
 
             return Result.Success("bid success.");
         }
 
         public Result<KLine> GetKLine(KLineRange range)
         {
-            return Result.Success(_drive.GetKLine(range));
+            return Result.Success(drive.GetKLine(range));
         }
 
         public void Start()
         {
-            _drive.Start();
+            drive.Start();
         }
 
         public void Stop()
         {
-            _drive.Stop();
+            drive.Stop();
         }
     }
 }

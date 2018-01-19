@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
+using IDI.BlockChain.Common;
 using IDI.BlockChain.Common.Enums;
 using IDI.BlockChain.Models.Transaction;
 using IDI.Core.Common;
-using IDI.Core.Utils;
+using IDI.Core.Infrastructure;
+using Microsoft.AspNetCore.SignalR;
 
 namespace IDI.BlockChain.Transaction.Client.SignalR
 {
@@ -15,45 +16,48 @@ namespace IDI.BlockChain.Transaction.Client.SignalR
         Open
     }
 
-    public sealed class QuotationTicker : Singleton<QuotationTicker>
+    public class QuotationTicker
     {
-        private readonly List<string> SYMBOLS = Configure.Symbol.All;
-        private readonly TimeSpan UPDATE_INTERVAL_QUOTATION = TimeSpan.FromMilliseconds(Configure.QuotationUpdateInterval);
-        private readonly object LOCK_STATE = new object();
-        private readonly object LOCK_QUOTATION = new object();
-        private volatile QuotationState quotationState;
-        private Timer timerQuotation;
+        private readonly static Lazy<QuotationTicker> instance = new Lazy<QuotationTicker>(() => new QuotationTicker(Runtime.GetService<IHubContext<QuotationHub>>().Clients));
+        private readonly IHubClients clients;
+        private readonly object lockOpening = new object();
+        private readonly object lockUpdating = new object();
+        private volatile QuotationState state;
+        private Timer timer;
 
-        public Func<Dictionary<KLineRange, Quotation>, Task> BroadcastQuotation;
+        public static QuotationTicker Instance => instance.Value;
 
         public QuotationState QuotationState
         {
-            get { return quotationState; }
-            private set { quotationState = value; }
+            get { return state; }
+            private set { state = value; }
         }
 
-        private QuotationTicker() { }
+        public QuotationTicker(IHubClients clients)
+        {
+            this.clients = clients;
+        }
 
         public void Open()
         {
-            lock (LOCK_STATE)
+            lock (lockOpening)
             {
-                if (quotationState != QuotationState.Open)
+                if (state != QuotationState.Open)
                 {
-                    timerQuotation = new Timer(UpdateQuotation, null, UPDATE_INTERVAL_QUOTATION, UPDATE_INTERVAL_QUOTATION);
+                    var interval = TimeSpan.FromMilliseconds(Configure.QuotationUpdateInterval);
+
+                    timer = new Timer(UpdateQuotation, null, interval, interval);
 
                     QuotationState = QuotationState.Open;
-
-                    //BroadcastMarketStateChange(QuotationState.Open);
                 }
             }
         }
 
         private void UpdateQuotation(object state)
         {
-            lock (LOCK_QUOTATION)
+            lock (lockUpdating)
             {
-                foreach (var symbol in SYMBOLS)
+                foreach (var symbol in Symbol.All)
                 {
                     Dictionary<KLineRange, Quotation> quotations;
 
@@ -73,7 +77,7 @@ namespace IDI.BlockChain.Transaction.Client.SignalR
 
             foreach (KLineRange range in ranges)
             {
-                var task = WebAPI.Get<Result<Quotation>>($"trans/quotation/{symbol.Replace("/", "")}/{(uint)range}");
+                var task = WebAPI.Get<Result<Quotation>>($"trans/quotation/{symbol}/{(uint)range}");
 
                 task.Wait();
 
@@ -86,13 +90,14 @@ namespace IDI.BlockChain.Transaction.Client.SignalR
             return quotations.Count > 0;
         }
 
-        private bool TryUpdateQuotationCache(Quotation cache, Quotation current)
+        private void BroadcastQuotation(Dictionary<KLineRange, Quotation> quotations)
         {
-            cache.KLine = current.KLine;
-            cache.Symbol = current.Symbol;
-            cache.Success = current.Success;
+            foreach (var kvp in quotations)
+            {
+                var groupName = $"kline/{kvp.Value.Symbol}/{kvp.Value.Range}";
 
-            return true;
+                this.clients.Group(groupName).InvokeAsync("quotationUpdated", kvp.Value);
+            }
         }
     }
 }

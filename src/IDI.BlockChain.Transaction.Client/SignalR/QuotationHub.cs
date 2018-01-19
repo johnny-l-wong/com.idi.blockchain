@@ -1,22 +1,23 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using IDI.BlockChain.Common.Enums;
-using IDI.BlockChain.Models.Transaction;
 using Microsoft.AspNetCore.SignalR;
 
 namespace IDI.BlockChain.Transaction.Client.SignalR
 {
     public class QuotationHub : Hub
     {
-        public QuotationHub()
+        private readonly QuotationTicker ticker;
+
+        public QuotationHub() : this(QuotationTicker.Instance) { }
+
+        public QuotationHub(QuotationTicker ticker)
         {
-            if (QuotationTicker.Instance.BroadcastQuotation == null)
-                QuotationTicker.Instance.BroadcastQuotation = BroadcastQuotation;
+            this.ticker = ticker;
         }
 
         public void Open()
         {
-            QuotationTicker.Instance.Open();
+            ticker.Open();
         }
 
         public async Task Subscribe(string symbol, KLineRange range)
@@ -31,16 +32,6 @@ namespace IDI.BlockChain.Transaction.Client.SignalR
             var groupName = $"kline/{symbol}/{range}";
 
             await Groups.RemoveAsync(Context.ConnectionId, groupName);
-        }
-
-        private async Task BroadcastQuotation(Dictionary<KLineRange, Quotation> quotations)
-        {
-            foreach (var kvp in quotations)
-            {
-                var groupName = $"kline/{kvp.Value.Symbol}/{kvp.Value.Range}";
-
-                await Clients.Group(groupName).InvokeAsync("quotationUpdated", kvp.Value);
-            }
         }
     }
 }

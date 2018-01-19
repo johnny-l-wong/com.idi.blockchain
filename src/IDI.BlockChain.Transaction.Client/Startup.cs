@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using IDI.BlockChain.Transaction.Client.SignalR;
+using IDI.Core.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -22,6 +19,8 @@ namespace IDI.BlockChain.Transaction.Client
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            Runtime.Initialize(services);
+
             services.AddMvc();
             services.AddSignalR();
         }

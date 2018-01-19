@@ -19,7 +19,7 @@ namespace IDI.BlockChain.Transaction.Service.Controllers
         [HttpGet("quotation/{symbol}/{range}")]
         public Result<Quotation> GetQuotation(string symbol, KLineRange range)
         {
-            var quotation = new Quotation { Symbol = symbol, Success = false };
+            var quotation = new Quotation { Symbol = symbol, Range = range, Success = false };
             var result = service.GetKLine(range);
 
             if (result.Status == ResultStatus.Success)

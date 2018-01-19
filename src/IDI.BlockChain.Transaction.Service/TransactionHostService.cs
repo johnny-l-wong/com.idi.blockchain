@@ -14,27 +14,20 @@ namespace IDI.BlockChain.Transaction.Service
 #endif
     {
         private readonly ITransactionService service;
-        //private readonly ILogger logger;
 
         public TransactionHostService(IWebHost host) : base(host)
         {
             this.service = Runtime.GetService<ITransactionService>();
-            //this.logger = Runtime.GetService<ILogger>();
-            //logger.Info("transaction service initialized.");
         }
 
         protected override void OnStarted()
         {
-            //service.Start();
             base.OnStarted();
-            //logger.Info("transaction service started.");
         }
 
         protected override void OnStopped()
         {
-            //service.Stop();
             base.OnStopped();
-            //logger.Info("transaction service stopped.");
         }
     }
 }
