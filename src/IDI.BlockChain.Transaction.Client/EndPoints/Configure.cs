@@ -1,4 +1,4 @@
-﻿namespace IDI.BlockChain.Transaction.Client.SignalR
+﻿namespace IDI.BlockChain.Transaction.Client.EndPoints
 {
     public class Configure
     {

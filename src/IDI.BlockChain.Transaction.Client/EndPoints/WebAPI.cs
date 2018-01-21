@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using IDI.Core.Extensions;
 
-namespace IDI.BlockChain.Transaction.Client.SignalR
+namespace IDI.BlockChain.Transaction.Client.EndPoints
 {
     public class WebAPI
     {

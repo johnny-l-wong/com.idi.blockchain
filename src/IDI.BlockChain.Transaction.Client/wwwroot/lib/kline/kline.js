@@ -9208,122 +9208,35 @@ function requestOverSignalR() {
         return;
 
     $(document).ready(function () {
-        var transportType = signalR.TransportType.WebSockets;
-        var logger = new signalR.ConsoleLogger(signalR.LogLevel.Information);
-        var quotationHub = new signalR.HttpConnection(`http://${document.location.host}/quotation`, { transport: transportType, logger: logger });
-        //var quotationHub = new signalR.HttpConnection(`http://${document.location.host}/quotation`, { transport: transportType });
-        KlineIns.ticker = new signalR.HubConnection(quotationHub, logger);
-        //KlineIns.ticker = new signalR.HubConnection(quotationHub);
-        KlineIns.ticker.on('quotationUpdated', (data) => {
+        let url = 'http://' + document.location.host + '/quotation';
+        KlineIns.ticker = new signalR.HttpConnection(url, { transport: signalR.TransportType.WebSockets, logging: new signalR.ConsoleLogger(signalR.LogLevel.Information) });
+        KlineIns.ticker.onreceive = function (data) {
+            data = JSON.parse(data);
             if (KlineIns.debug) {
                 console.log(`received:${data}`);
             }
             if (data.success) {
                 if (data.symbol === KlineIns.symbol && data.range === KlineIns.range) {
                     if (KlineIns.debug) {
-                        console.log("quotation updated");
+                        console.log("quotation received");
                     }
                     requestSuccessHandler(data);
                 }
             } else {
-                console.log('quotation update error.')
+                console.log('quotation data error.')
             }
-        });
-
-        KlineIns.ticker.start()
-            .then(() => {
-                console.log('connected successfully');
-                //isConnected = true;
-                KlineIns.ticker.invoke('Open');
-                KlineIns.ticker.invoke('Subscribe', KlineIns.symbol, KlineIns.range);
-            })
-            .catch(err => {
-                console.log(err);
-            });
-
-        //invoke(KlineIns.ticker, 'Subscribe', KlineIns.symbol, KlineIns.range);
+        };
+        KlineIns.ticker.start().then(function () {
+            KlineIns.ticker.send(JSON.stringify({ symbol: KlineIns.symbol, range: KlineIns.range }));
+        })
     });
-    //$(document).ready(function () {
-    //    KlineIns.ticker = $.connection.quotationTicker;
-
-    //    function init() {
-    //        if (KlineIns.debug) {
-    //            console.log(`DEBUG: ${KlineIns.account}:${KlineIns.symbol}/${KlineIns.range}`);
-    //        }
-    //        return KlineIns.ticker.server.getData(KlineIns.symbol, KlineIns.range, KlineIns.account).done(function (data) {
-    //            if (KlineIns.debug) {
-    //                console.log("getData");
-    //            };
-    //        });
-    //    }
-
-    //    // Add client-side hub methods that the server will call
-    //    $.extend(KlineIns.ticker.client, {
-    //        updateKLine: function (data) {
-    //            if (data.success) {
-    //                if (data.symbol === KlineIns.symbol && data.range === KlineIns.range) {
-    //                    if (KlineIns.debug) {
-    //                        console.log("kline updated");
-    //                    }
-    //                    requestSuccessHandler(data);
-    //                }
-    //            } else {
-    //                console.log('kline update error.')
-    //            }
-    //        },
-    //        updateOrder: function (data) {
-    //            if (data.success) {
-    //                if (data.symbol === KlineIns.symbol && data.account === KlineIns.account) {
-    //                    if (KlineIns.debug) {
-    //                        console.log("order updated");
-    //                    }
-    //                    KlineIns.onOrderChange(data);
-    //                }
-    //            } else {
-    //                console.log('order update error.')
-    //            }
-    //        }
-    //    });
-
-    //    // Start the connection
-    //    $.connection.hub.start()
-    //        .then(init)
-    //        .then(function () {
-    //            return KlineIns.ticker.server.getMarketState();
-    //        })
-    //        .done(function (state) {
-    //            if (state === 'Closed') {
-    //                KlineIns.ticker.server.openMarket();
-    //            }
-    //        });
-    //});
 }
-//var isConnected = false;
-//function invoke(connection, method, ...args) {
-//    if (!isConnected) {
-//        return;
-//    }
-//    var argsArray = Array.prototype.slice.call(arguments);
-//    connection.invoke.apply(connection, argsArray.slice(1))
-//        .then(result => {
-//            console.log("invocation completed successfully: " + (result === null ? '(null)' : result));
-//        })
-//        .catch(err => {
-//            console.log(err);
-//        });
-//}
 
 function periodChanged(original) {
     if (!KlineIns.ticker)
         return;
 
-    KlineIns.ticker.invoke('Unsubscribe', original.symbol, original.range);
-    KlineIns.ticker.invoke('Subscribe', KlineIns.symbol, KlineIns.range);
-    //return KlineIns.ticker.server.getKLine(KlineIns.symbol, KlineIns.range).done(function (data) {
-    //    if (KlineIns.debug) {
-    //        console.log(`join group '${KlineIns.symbol}/${KlineIns.range}'`);
-    //    };
-    //});
+    KlineIns.ticker.send(JSON.stringify({ symbol: KlineIns.symbol, range: KlineIns.range }));
 }
 
 function requestSuccessHandler(res) {

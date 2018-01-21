@@ -1,4 +1,4 @@
-using IDI.BlockChain.Transaction.Client.SignalR;
+using IDI.BlockChain.Transaction.Client.EndPoints;
 using IDI.Core.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -22,7 +22,19 @@ namespace IDI.BlockChain.Transaction.Client
             Runtime.Initialize(services);
 
             services.AddMvc();
-            services.AddSignalR();
+
+            services.AddSockets();
+            services.AddCors(o =>
+            {
+                o.AddPolicy("Everything", p =>
+                {
+                    p.AllowAnyHeader()
+                     .AllowAnyMethod()
+                     .AllowAnyOrigin();
+                });
+            });
+
+            services.AddEndPoint<QuotationEndPoint>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,16 +51,17 @@ namespace IDI.BlockChain.Transaction.Client
             }
 
             app.UseStaticFiles();
-            app.UseSignalR(routes =>
-            {
-                routes.MapHub<QuotationHub>("quotation");
-            });
-
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
                     template: "{controller}/{action=btcusdt}/{id?}");
+            });
+
+            app.UseCors("Everything");
+            app.UseSockets(routes =>
+            {
+                routes.MapEndPoint<QuotationEndPoint>("quotation");
             });
         }
     }
