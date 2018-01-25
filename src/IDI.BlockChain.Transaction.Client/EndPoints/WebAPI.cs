@@ -19,7 +19,7 @@ namespace IDI.BlockChain.Transaction.Client.EndPoints
                 //{
                 //    var obj = e.Result;
                 //};
-                string json = await client.DownloadStringTaskAsync(new Uri($"http://localhost:17528/api/{url}"));
+                string json = await client.DownloadStringTaskAsync(new Uri($"http://192.168.0.137:17528/api/{url}"));
                 //string json = await client.DownloadStringTaskAsync(new Uri($"{Configure.Api}/{url}"));
 
                 return json.To<T>();

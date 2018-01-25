@@ -119,7 +119,7 @@
 </div>
 
 @section Scripts{
-    <script type="text/javascript">
+<script type="text/javascript">
         Number.prototype.toFixed = function (s) {
             var number = this.toString();
             if (number.indexOf('.') == -1) {
@@ -203,7 +203,7 @@
 
                         $.ajax({
                             type: "get", datatype: "json",
-                            url: "http://localhost:17528/api/trans/quotation",
+                            url: "http://192.168.0.137:17528/api/trans/quotation",
                             beforeSend: function () {
                                 self.polling = true;
                             },
@@ -225,7 +225,7 @@
                     $.ajax({
                         type: "post",
                         crossDomain: true,
-                        url: "http://localhost:17528/api/trans/start",
+                        url: "http://192.168.0.137:17528/api/trans/start",
                         datatype: "json",
                         beforeSend: function () {
                             $("#btnStart").attr("disabled", "disabled");
@@ -250,7 +250,7 @@
                     $.ajax({
                         type: "post",
                         crossDomain: true,
-                        url: "http://localhost:17528/api/trans/stop",
+                        url: "http://192.168.0.137:17528/api/trans/stop",
                         datatype: "json",
                         beforeSend: function () {
                             $("#btnStart").removeAttr("disabled", "disabled");
@@ -274,7 +274,7 @@
                     $.ajax({
                         type: "post",
                         crossDomain: true,
-                        url: "http://localhost:17528/api/trans/trade",
+                        url: "http://192.168.0.137:17528/api/trans/trade",
                         data: JSON.stringify({ uid: 10001, tran_type: 1, price: self.bid.price, size: self.bid.volume }),
                         contentType: "application/json; charset=utf-8",
                         datatype: "json",
@@ -296,7 +296,7 @@
                     $.ajax({
                         type: "post",
                         crossDomain: true,
-                        url: "http://localhost:17528/api/trans/trade",
+                        url: "http://192.168.0.137:17528/api/trans/trade",
                         data: JSON.stringify({ uid: 10002, tran_type: 0, price: self.ask.price, size: self.ask.volume }),
                         contentType: "application/json; charset=utf-8",
                         datatype: "json",
@@ -314,7 +314,7 @@
                 }
             },
         });
-    </script>
+</script>
 }
 
 
