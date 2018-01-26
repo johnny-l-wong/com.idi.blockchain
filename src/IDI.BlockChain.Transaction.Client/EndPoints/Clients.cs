@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using IDI.BlockChain.Models.Transaction;
+using IDI.Core.Infrastructure;
+using IDI.Core.Logging;
 using IDI.Core.Utils;
 
 namespace IDI.BlockChain.Transaction.Client.EndPoints
@@ -8,6 +10,7 @@ namespace IDI.BlockChain.Transaction.Client.EndPoints
     public sealed class Clients : Singleton<Clients>
     {
         private Dictionary<Group, List<string>> groups;
+        private ILogger logger;
 
         public List<Group> Groups
         {
@@ -20,6 +23,7 @@ namespace IDI.BlockChain.Transaction.Client.EndPoints
         private Clients()
         {
             groups = new Dictionary<Group, List<string>>();
+            logger = Runtime.GetService<ILogger>();
         }
 
         public List<string> Connections(Group group) => groups.ContainsKey(group) ? groups[group] : new List<string>();
@@ -37,6 +41,8 @@ namespace IDI.BlockChain.Transaction.Client.EndPoints
             {
                 groups.Add(group, new List<string> { connectionId });
             }
+
+            logger.Info($"Clients.Join|{group.Name}|{connectionId}");
         }
 
         public void Remove(string connectionId)
@@ -46,6 +52,7 @@ namespace IDI.BlockChain.Transaction.Client.EndPoints
                 if (kvp.Value.Contains(connectionId))
                 {
                     kvp.Value.Remove(connectionId);
+                    logger.Info($"Clients.Remove|{kvp.Key.Name}|{connectionId}");
                     break;
                 }
             }
