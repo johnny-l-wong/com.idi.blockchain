@@ -14,3 +14,6 @@
 /src/IDI.BlockChain.Transaction.Client/obj
 /src/IDI.BlockChain.Transaction.Client/bin
 /src/IDI.BlockChain.Transaction.Service/*.user
+/src/IDI.BlockChain.Transaction.Client/Properties/PublishProfiles/*.user
+/src/IDI.BlockChain.Transaction.Client/logs
+/src/IDI.BlockChain.Transaction.Client/Properties/PublishProfiles/*.pubxml
